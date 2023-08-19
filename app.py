@@ -196,9 +196,8 @@ def create_app(test_config=None):
     app = Flask(__name__)
     CORS(app)
     
-    # Configure the app and database connection
-    app.config.from_object('config')
-    db.init_app(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://jlvjdfmxzsjfjb:87eacc615b5b95666b397bc1b8a4698ee339abfd03b0861f6363d71c10ff5104@ec2-54-234-13-16.compute-1.amazonaws.com:5432/dc1nv8tdd0nmn5"
+    db.init_app(app)  # Initialize the database
 
     @app.route('/actors', methods=['GET'])
     @requires_auth(['get:actors'])
