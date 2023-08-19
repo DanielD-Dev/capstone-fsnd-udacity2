@@ -215,17 +215,17 @@ def create_app(test_config=None):
 
     
     @app.route('/movies', methods=['GET'])
-    @requires_auth('get:movies')
+    @requires_auth(['get:movies'])
     def get_movies(payload):
-    try:
-        movies = Movie.query.all()  # Assuming Movie is your SQLAlchemy model
-        formatted_movies = [movie.format() for movie in movies]  # Format movies using a method in your model
-        return jsonify({
-            'success': True,
-            'movies': formatted_movies
-        })
-    except Exception:
-        abort(500)
+      try:
+          movies = Movie.query.all()  # Assuming Movie is your SQLAlchemy model
+          formatted_movies = [movie.format() for movie in movies]  # Format movies using a method in your model
+          return jsonify({
+              'success': True,
+              'movies': formatted_movies
+          })
+      except Exception:
+          abort(500)
     
     @app.route('/actors', methods=['POST'])
     @requires_auth(['post:actors'])
