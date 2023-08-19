@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify  
 import json
 from functools import wraps
 from jose import jwt
@@ -57,6 +57,50 @@ def get_token_auth_header():
     token = parts[1]
     return token
 
+# Custom error handler for 400 Bad Request
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": "Bad Request"
+    }), 400
+
+# Custom error handler for 401 Unauthorized
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "Unauthorized"
+    }), 401
+
+# Custom error handler for 403 Forbidden
+@app.errorhandler(403)
+def forbidden(error):
+    return jsonify({
+        "success": False,
+        "error": 403,
+        "message": "Forbidden"
+    }), 403
+
+# Custom error handler for 404 Not Found
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "Resource Not Found"
+    }), 404
+
+# Custom error handler for other internal errors
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({
+        "success": False,
+        "error": 500,
+        "message": "Internal Server Error"
+    }), 500
 
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
