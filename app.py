@@ -200,7 +200,7 @@ def create_app(test_config=None):
     db.init_app(app)  # Initialize the database
 
     @app.route('/actors', methods=['GET'])
-    @requires_auth(['get:actors'])
+    @requires_auth(permissions=['get:actors'], roles=['Casting Assistant', 'Casting Director', 'Executive Producer'])
     def get_actors(payload):
         try:
             actors = Actor.query.all()  # Assuming Actor is your SQLAlchemy model
@@ -211,23 +211,22 @@ def create_app(test_config=None):
             })
         except Exception:
             abort(500)
-
     
     @app.route('/movies', methods=['GET'])
-    @requires_auth(['get:movies'])
+    @requires_auth(permissions=['get:movies'], roles=['Casting Assistant', 'Casting Director', 'Executive Producer'])
     def get_movies(payload):
-      try:
-          movies = Movie.query.all()  # Assuming Movie is your SQLAlchemy model
-          formatted_movies = [movie.format() for movie in movies]  # Format movies using a method in your model
-          return jsonify({
-              'success': True,
-              'movies': formatted_movies
-          })
-      except Exception:
-          abort(500)
+        try:
+            movies = Movie.query.all()
+            formatted_movies = [movie.format() for movie in movies]
+            return jsonify({
+                'success': True,
+                'movies': formatted_movies
+            })
+        except Exception:
+            abort(500)
     
     @app.route('/actors', methods=['POST'])
-    @requires_auth(['post:actors'])
+    @requires_auth(permissions=['post:actors'], roles=['Casting Director', 'Executive Producer'])
     def create_actor(payload):
         try:
             data = request.get_json()
@@ -246,8 +245,28 @@ def create_app(test_config=None):
             db.session.rollback()
             abort(500)
     
+    @app.route('/actors', methods=['POST'])
+    @requires_auth(permissions=['post:actors'], roles=['Casting Director', 'Executive Producer'])
+    def create_actor(payload):
+        try:
+            data = request.get_json()
+            new_actor = Actor(
+                name=data.get('name'),
+                age=data.get('age'),
+                gender=data.get('gender')
+            )
+            db.session.add(new_actor)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'actor': new_actor.format()
+            })
+        except Exception:
+            db.session.rollback()
+            abort(500)
+
     @app.route('/movies', methods=['POST'])
-    @requires_auth(['post:movies'])
+    @requires_auth(permissions=['post:movies'], roles=['Executive Producer'])
     def create_movie(payload):
         try:
             data = request.get_json()
@@ -266,7 +285,7 @@ def create_app(test_config=None):
             abort(500)
     
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
-    @requires_auth(['patch:actors'])
+    @requires_auth(permissions=['patch:actors'], roles=['Casting Director', 'Executive Producer'])
     def update_actor(payload, actor_id):
         try:
             actor = Actor.query.get(actor_id)
@@ -289,9 +308,10 @@ def create_app(test_config=None):
         except Exception:
             db.session.rollback()
             abort(500)
+
     
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
-    @requires_auth(['patch:movies'])
+    @requires_auth(permissions=['patch:movies'], roles=['Casting Director', 'Executive Producer'])
     def update_movie(payload, movie_id):
         try:
             movie = Movie.query.get(movie_id)
@@ -314,7 +334,7 @@ def create_app(test_config=None):
             abort(500)
     
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
-    @requires_auth(['delete:actors'])
+    @requires_auth(permissions=['delete:actors'], roles=['Casting Director', 'Executive Producer'])
     def delete_actor(payload, actor_id):
         try:
             actor = Actor.query.get(actor_id)
@@ -330,9 +350,9 @@ def create_app(test_config=None):
         except Exception:
             db.session.rollback()
             abort(500)
-    
+        
     @app.route('/movies/<int:movie_id>', methods=['DELETE'])
-    @requires_auth(['delete:movies'])
+    @requires_auth(permissions=['delete:movies'], roles=['Executive Producer'])
     def delete_movie(payload, movie_id):
         try:
             movie = Movie.query.get(movie_id)
@@ -348,6 +368,7 @@ def create_app(test_config=None):
         except Exception:
             db.session.rollback()
             abort(500)
+
     
     # Custom error handler for 422 Unprocessable Entity
     @app.errorhandler(422)
