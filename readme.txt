@@ -55,7 +55,9 @@ pip install -r requirements.txt
 2. Run the Development Server:
 
 python app.py
-The server will be running at http://localhost:8080.
+The server will be running at https://capstone-fsnd-udacity-44f9232cb6dd.herokuapp.com
+
+alternatively, if running locally you can use: http://localhost:8080.
 
 API Documentation and RBAC Controls
 
