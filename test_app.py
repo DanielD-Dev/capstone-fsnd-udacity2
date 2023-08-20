@@ -1,5 +1,7 @@
 import unittest
 from app import create_app
+from auth import AuthError, requires_auth
+
 
 class YourTestCase(unittest.TestCase):
     def setUp(self):
@@ -64,11 +66,11 @@ class YourTestCase(unittest.TestCase):
 
     # Test RBAC behavior for different roles
     def test_get_movies_unauthorized(self):
-        response = self.app.get('/movies', headers={'Authorization': 'Bearer YOUR_INVALID_TOKEN'})
+        response = self.app.get('/movies', headers={'Authorization': 'Bearer rol_cIg3ZghFe3ALr666'}) # Invalid token
         self.assertEqual(response.status_code, 401)
 
     def test_create_movie_forbidden(self):
-        response = self.app.post('/movies', headers={'Authorization': 'Bearer YOUR_ACTOR_TOKEN'})
+        response = self.app.post('/movies', headers={'Authorization': 'Bearer rol_cIg3ZghFe3ALr2L5'}) # Casting Assistant
         self.assertEqual(response.status_code, 403)
 
     # I can also add similar RBAC test cases for other endpoints and roles if needed
